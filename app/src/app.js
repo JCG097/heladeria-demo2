@@ -3,6 +3,7 @@
 const path = require('node:path');
 const express = require('express');
 const { manejarErrores } = require('./errores');
+const { listarSabores, buscarSabor } = require('./sabores');
 
 function crearApp() {
   const app = express();
@@ -14,6 +15,18 @@ function crearApp() {
 
   app.get('/health', (req, res) => {
     res.json({ estado: 'ok' });
+  });
+
+  app.get('/api/sabores', (req, res) => {
+    res.json(listarSabores());
+  });
+
+  app.get('/api/sabores/:nombre', (req, res, next) => {
+    try {
+      res.json(buscarSabor(req.params.nombre));
+    } catch (err) {
+      next(err);
+    }
   });
 
   // Manejo central de errores: siempre al final.
