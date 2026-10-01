@@ -3,6 +3,7 @@
 const path = require('node:path');
 const express = require('express');
 const { manejarErrores } = require('./errores');
+const { pedirHelado } = require('./sabores');
 
 function crearApp() {
   const app = express();
@@ -14,6 +15,11 @@ function crearApp() {
 
   app.get('/health', (req, res) => {
     res.json({ estado: 'ok' });
+  });
+
+  app.post('/pedidos', (req, res) => {
+    const pedido = pedirHelado(req.body.sabor);
+    res.status(201).json(pedido);
   });
 
   // Manejo central de errores: siempre al final.
