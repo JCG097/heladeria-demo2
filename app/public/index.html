@@ -3,27 +3,66 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>heladeria-demo2</title>
+  <title>Heladería</title>
   <style>
     :root { --fondo: #f4f5f7; --tinta: #1c1f22; --gris: #5f666d; --acento: #2f5bd3; }
     * { box-sizing: border-box; }
     body {
-      margin: 0; min-height: 100vh; display: grid; place-items: center;
+      margin: 0; min-height: 100vh;
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
       background: var(--fondo); color: var(--tinta); line-height: 1.5;
     }
-    main { max-width: 560px; padding: 32px; text-align: center; }
+    main { max-width: 720px; margin: 0 auto; padding: 32px; text-align: center; }
     h1 { margin: 0 0 8px; font-size: 2rem; }
     p { margin: 0; color: var(--gris); }
-    .estado { display: inline-block; margin-top: 24px; padding: 6px 12px; border-radius: 999px;
-      background: #e3e9fb; color: var(--acento); font-weight: 600; font-size: 0.9rem; }
+    .sabores {
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+      gap: 16px; margin-top: 24px;
+    }
+    .sabor {
+      background: #fff; border-radius: 12px; padding: 20px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+    .sabor h2 { margin: 0 0 8px; font-size: 1.1rem; }
+    .sabor .precio { color: var(--acento); font-weight: 600; }
   </style>
 </head>
 <body>
   <main>
-    <h1 data-testid="titulo-app">heladeria-demo2</h1>
-    <p data-testid="descripcion-app">Proyecto creado con la plantilla DevSecOps con IA. Las funcionalidades llegan con cada historia de usuario.</p>
-    <span class="estado" data-testid="estado-app">Listo para la primera historia</span>
+    <h1 data-testid="titulo-app">Heladería</h1>
+    <p data-testid="descripcion-app">Elige tu sabor favorito y descubre su precio.</p>
+    <div class="sabores" data-testid="lista-sabores"></div>
   </main>
+  <script>
+    function formatearPrecio(precio) {
+      return `$${precio.toLocaleString('es-CO')}`;
+    }
+
+    function testIdSabor(nombre) {
+      return `sabor-${nombre
+        .toLowerCase()
+        .normalize('NFD')
+        .replace(/[̀-ͯ]/g, '')}`;
+    }
+
+    async function cargarSabores() {
+      const contenedor = document.querySelector('[data-testid="lista-sabores"]');
+      const respuesta = await fetch('/api/sabores');
+      const sabores = await respuesta.json();
+
+      contenedor.innerHTML = sabores
+        .map(
+          (sabor) => `
+            <article class="sabor" data-testid="${testIdSabor(sabor.nombre)}">
+              <h2>${sabor.nombre}</h2>
+              <p class="precio">${formatearPrecio(sabor.precio)}</p>
+            </article>
+          `
+        )
+        .join('');
+    }
+
+    cargarSabores();
+  </script>
 </body>
 </html>
